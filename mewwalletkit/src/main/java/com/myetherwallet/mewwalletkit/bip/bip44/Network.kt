@@ -98,13 +98,23 @@ sealed class Network(val title: String, val path: String, val chainId: BigIntege
         }
 
     companion object {
-        fun findByChaidId(chainId: BigInteger?): Network? {
-            for (sealedSubclass in Network::class.sealedSubclasses) {
-                if (sealedSubclass is Network && sealedSubclass.chainId == chainId) {
-                    return sealedSubclass
-                }
-            }
-            return null
-        }
+        private val ALL_NETWORKS: List<Network> = listOf(
+            BITCOIN, LITECOIN, SINGULAR_DTV, ROPSTEN, EXPANSE,
+            LEDGER_LIVE_ETHEREUM, KEEPKEY_ETHEREUM, LEDGER_ETHEREUM, ETHEREUM,
+            LEDGER_ETHEREUM_CLASSIC, LEDGER_ETHEREUM_CLASSIC_VINTAGE,
+            LEDGER_LIVE_ETHEREUM_CLASSIC, KEEPKEY_ETHEREUM_CLASSIC, ETHEREUM_CLASSIC,
+            MIX_BLOCKCHAIN, UBIQ, RSK_MAINNET, ELLAISM, PIRL, MUSICOIN, CALLISTO,
+            TOMO_CHAIN, THUNDERCORE, ETHEREUM_SOCIAL, ATHEIOS, ETHER_GEM, EOS_CLASSIC,
+            GO_CHAIN, ETHER_SOCIAL_NETWORK, RSK_TESTNET, AKROMA, IOLITE, ETHER1,
+            GOERLI, ANONYMIZED_ID
+        )
+
+        /** Returns the first known network whose [chainId] matches, or null if none match. */
+        fun findByChainId(chainId: BigInteger?): Network? =
+            ALL_NETWORKS.firstOrNull { it.chainId == chainId }
+
+        /** @deprecated Use [findByChainId] (fixes the typo). */
+        @Deprecated("Typo in name, use findByChainId instead", ReplaceWith("findByChainId(chainId)"))
+        fun findByChaidId(chainId: BigInteger?): Network? = findByChainId(chainId)
     }
 }

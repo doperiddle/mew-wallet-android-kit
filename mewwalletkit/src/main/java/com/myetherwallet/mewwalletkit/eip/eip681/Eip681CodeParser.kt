@@ -18,12 +18,17 @@ object Eip681CodeParser {
         return parse(string)
     }
 
-    fun parse(string: String): Eip681Code? {
+    fun parse(string: String): Eip681Code? = try {
+        parseInternal(string)
+    } catch (e: Exception) {
+        null
+    }
+
+    private fun parseInternal(string: String): Eip681Code? {
         val encoding = URLDecoder.decode(string, "UTF-8")
         val matcher = Regex("^ethereum:(?>(?<${Eip681Group.TYPE}>[^-]*)-)?(?<${Eip681Group.TARGET}>[0-9a-zA-Z.]+)?(?>@(?<${Eip681Group.CHAIN_ID}>[0-9]+))?/?(?>(?<${Eip681Group.FUNCTION_NAME}>[^?\n]+))?[?]?(?<${Eip681Group.PARAMETERS}>.+)?$")
-        val matches = matcher.find(encoding)
-
-        val match = matches!!.groups as MatchNamedGroupCollection
+        val matches = matcher.find(encoding) ?: return null
+        val match = matches.groups as MatchNamedGroupCollection
 
         val target = match[Eip681Group.TARGET] ?: return null
         val targetAddress = Address.createRaw(target)

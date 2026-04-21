@@ -43,6 +43,17 @@ class Address constructor(val address: String) : Parcelable {
 
     fun isDefault() = address.isEmpty()
 
+    /**
+     * Returns true if [address] is a non-empty Ethereum address whose mixed-case encoding exactly
+     * matches the EIP-55 checksum encoding.  Addresses that were created via [createEthereum] are
+     * always normalised to EIP-55, so this is most useful when validating externally-supplied strings.
+     */
+    fun isChecksumValid(): Boolean {
+        if (address.isEmpty()) return false
+        val eip55 = address.eip55() ?: return false
+        return address == eip55
+    }
+
     override fun toString() = address
 
     override fun equals(other: Any?): Boolean {

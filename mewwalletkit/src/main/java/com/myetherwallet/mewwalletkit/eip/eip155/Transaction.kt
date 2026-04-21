@@ -90,7 +90,5 @@ abstract class Transaction(
         LEGACY("0x".hexToByteArray())
     }
 
-    internal open fun rlpData(chainId: BigInteger? = null, forSignature: Boolean = false): RlpArray {
-        throw IllegalAccessError("Please override it in the subclass if you want to have rlp encoded values")
-    }
+    internal abstract fun rlpData(chainId: BigInteger? = null, forSignature: Boolean = false): RlpArray
 }
