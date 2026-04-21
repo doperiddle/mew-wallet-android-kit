@@ -27,7 +27,7 @@ class Eip681ErrorPathTest {
     }
 
     @Test
-    fun `parse returns null for unknown EipQrCodeType`() {
+    fun `parse returns null for unknown type prefix in URI`() {
         // 'unknown' is not a valid EipQrCodeType — should return null rather than crash.
         assertNull(Eip681CodeParser.parse("ethereum:unknown-0xcccc00000000000000000000000000000000cccc/transfer"))
     }

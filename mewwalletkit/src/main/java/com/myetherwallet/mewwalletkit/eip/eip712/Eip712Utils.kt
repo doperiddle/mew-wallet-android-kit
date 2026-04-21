@@ -16,38 +16,24 @@ private const val TAG = "Eip712Utils"
 
 object Eip712Utils {
 
+    private val gsonAdapter: Eip712JsonAdapter = object : Eip712JsonAdapter {
+        override fun parse(typedDataJson: String): Eip712JsonAdapter.Result =
+            Gson().fromJson(typedDataJson, Eip712JsonAdapter.Result::class.java)
+
+        override fun parse(inputStream: InputStream): Eip712JsonAdapter.Result =
+            inputStream.reader(Charsets.UTF_8).use { reader ->
+                Gson().fromJson(reader, Eip712JsonAdapter.Result::class.java)
+            }
+    }
+
     fun getHash(json: String): ByteArray {
         val unescaped = unescapeJson(json).toString()
-        val adapter = object : Eip712JsonAdapter {
-            override fun parse(typedDataJson: String): Eip712JsonAdapter.Result {
-                return Gson().fromJson(typedDataJson, Eip712JsonAdapter.Result::class.java)
-            }
-
-            override fun parse(inputStream: InputStream): Eip712JsonAdapter.Result {
-                return inputStream.reader(Charsets.UTF_8).use { reader ->
-                    Gson().fromJson(reader, Eip712JsonAdapter.Result::class.java)
-                }
-            }
-        }
-        val eip712JsonParser = Eip712JsonParser(adapter)
-        val domainWithMessage = eip712JsonParser.parseMessage(unescaped)
+        val domainWithMessage = Eip712JsonParser(gsonAdapter).parseMessage(unescaped)
         return typedDataHash(domainWithMessage.message, domainWithMessage.domain)
     }
 
     fun getHash(inputStream: InputStream): ByteArray {
-        val adapter = object : Eip712JsonAdapter {
-            override fun parse(typedDataJson: String): Eip712JsonAdapter.Result {
-                return Gson().fromJson(typedDataJson, Eip712JsonAdapter.Result::class.java)
-            }
-
-            override fun parse(inputStream: InputStream): Eip712JsonAdapter.Result {
-                return inputStream.reader(Charsets.UTF_8).use { reader ->
-                    Gson().fromJson(reader, Eip712JsonAdapter.Result::class.java)
-                }
-            }
-        }
-        val eip712JsonParser = Eip712JsonParser(adapter)
-        val domainWithMessage = eip712JsonParser.parseMessage(inputStream)
+        val domainWithMessage = Eip712JsonParser(gsonAdapter).parseMessage(inputStream)
         return typedDataHash(domainWithMessage.message, domainWithMessage.domain)
     }
 
